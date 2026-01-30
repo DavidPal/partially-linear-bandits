@@ -12,6 +12,7 @@
 \DeclareMathOperator*{\subjectto}{subject\ to}
 \DeclareMathOperator*{\argmax}{argmax}
 \DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator{\Regret}{Regret}
 
 \newtheorem{lemma}{Lemma}
 \newtheorem{theorem}[lemma]{Theorem}
@@ -37,7 +38,10 @@
 
 We propose several variants of a new sequential decision problem which we call
 \emph{partially linear bandit problem}. We do not provide any results (no
-algorithms, no theorems).
+algorithms, no theorems). The problem is related to Double Machine
+Learning~\cite{Chernozhukov-Chetverikov-Demirer-Duflo-Hansen-Newey-Robins-2024}
+and stochastic linear bandit problem~\cite{Abbasi-Yadkori-Pal-Szepesvari-2011},
+\cite[Chapter 19]{Lattimore-Szepesvari-2020}.
 
 Partially linear bandit problem is a sequential decision making problem played
 over a number of rounds. At the beginning of each round $t$, we are given a
@@ -145,7 +149,11 @@ $$
 $$
 \end{enumerate}
 
-\nocite{*}
+With either of these two goals we can define the notion of regret:
+$$
+\Regret_T = TODO
+$$
+
 \bibliography{bibliography}
 \bibliographystyle{chicago}
 
