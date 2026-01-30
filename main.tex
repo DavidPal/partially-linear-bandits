@@ -1,0 +1,100 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{fullpage}
+\usepackage{hyperref}
+\usepackage[numbers]{natbib}
+
+\DeclareMathOperator*{\maximize}{maximize}
+\DeclareMathOperator*{\minimize}{minimize}
+\DeclareMathOperator*{\subjectto}{subject\ to}
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{argmin}
+
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}[lemma]{Theorem}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+
+\newcommand{\I}{\mathcal{I}}
+\newcommand{\J}{\mathcal{J}}
+\newcommand{\K}{\mathcal{K}}
+\renewcommand{\P}{\mathcal{P}}
+\newcommand{\Q}{\mathcal{Q}}
+
+\begin{document}
+
+\title{Linear Control Models}
+\author{David P\'al}
+\date{January 27, 2026}
+\maketitle
+
+\section{Introduction}
+
+Pricing at Uber can be phrased as a sequential decision problem.  Every week
+$t$, Uber needs to choose a price plan. A price plan can be encoded as a vector
+of decision variables $x_t \in \R^n$. The coordinates of vector $x_t$ consists
+of driver and rider price multipliers for every ``hex-cluster''\footnote{This
+is a geographic area that roughly corresponds to a part of a city. Cities are
+partitioned into between 3 to 10 hex-clusters.} and every hour of the
+week\footnote{There are $24 \times 7 = 168$ hours in a week}.
+
+For each hour and hex-cluster, we need to predict various bussiness metrics,
+such as number of sessions, number requesting sessions, number of completed
+trips, gross bookings, profit, etc. We denote the vector of these predictions
+as $y_t \in \R^m$. The predictions, of course, depend on the selected values
+for the decision variable $x_t$. This dependency is captured by a function
+$f_t:\R^n \to \R^m$ which maps $x_t$ to $y_t$. This function is called a
+\emph{simulator}.  The function $s_t$ might depend on past information (e.g.
+$x_1, x_2, \dots, x_{t-1}$, $y_1, y_2, \dots, y_{t-1}$ or any other past
+information).
+
+In this paper, we consider simulators that are affine functions, i.e.,
+$$
+s_t(x) = A_t x + b_t \: .
+$$
+The reason for this assumption is then the optimization problem can be solved 
+with efficient methods.
+
+\section{Double ML}
+
+The double ML model has a simulator of the form
+$$
+s_t(x) = \widetilde{y}_t + A(x - \widetilde{x}_t)
+$$
+The model is parameterized by an $m \times n$ matrix $A$.  Here
+$\widetilde{y}_t$ is a forecast that does \emph{not} depend on $x_t$.
+Similarly, $\widetilde{x}_t$ is a baseline forecast of independent of $x_t$.
+The pair $(\widetilde{x}_t, \widetilde{y}_t)$ can be predicted by a non-linear
+forecasting time series model from
+$$
+(x_1, y_1, z_1),  (x_2,y_2,z_3) \dots, (x_{t-1}, y_{t-1}, z_{t-1})
+$$
+where the sequence $z_1, z_2, \dots, z_{t-1}$ represents any other information.
+
+\section{Bilinear Double ML}
+
+The bilinear ML model has a simulator of the form
+$$
+s_t(x) = \widetilde{y}_t + Z_t A (x - \widetilde{x}_t)
+$$
+The role of $\widetilde{x}_t$ and $\widetilde{y_t}$ is exactly the same as in
+the double ML model. The model is parameterized by an $d \times n$ matrix $A$.
+The matrix $Z_t$ is a $m \times d$ matrix of contextual features.
+
+\section{Linear MDP}
+
+$$
+s_t(x) = B y_{t-1}  + A x
+$$
+The model is paramterized by a $m \times m$ matrix $B$ and $m \times n$ matrix $B$.
+
+\nocite{*}
+\bibliography{bibliography}
+\bibliographystyle{chicago}
+
+\end{document}
