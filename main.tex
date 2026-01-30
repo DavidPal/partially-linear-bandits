@@ -12,20 +12,18 @@
 \DeclareMathOperator*{\subjectto}{subject\ to}
 \DeclareMathOperator*{\argmax}{argmax}
 \DeclareMathOperator*{\argmin}{argmin}
-\DeclareMathOperator{\Regret}{Regret}
+\DeclareMathOperator{\RewardRegret}{RewardRegret}
+\DeclareMathOperator{\EstimationRegret}{EstimationRegret}
+\newcommand{\ip}[2]{\left\langle #1, #2 \right\rangle} % inner product or bilinear map
 
 \newtheorem{lemma}{Lemma}
 \newtheorem{theorem}[lemma]{Theorem}
 
-\newcommand{\N}{\mathbb{N}}
-\newcommand{\Z}{\mathbb{Z}}
+% Set of real numbers
 \newcommand{\R}{\mathbb{R}}
 
-\newcommand{\I}{\mathcal{I}}
-\newcommand{\J}{\mathcal{J}}
-\newcommand{\K}{\mathcal{K}}
-\renewcommand{\P}{\mathcal{P}}
-\newcommand{\Q}{\mathcal{Q}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\Z}{\mathcal{Z}}
 
 \begin{document}
 
@@ -102,7 +100,7 @@ the problem depending on the sequence $y_1, y_2, \dots$ can be generated.
 \theta^T x_t + \epsilon_t$ where $f:\mathcal{Z} \to \R$ is a function that
 belongs to a class of functions $\mathcal{F}$, and $\theta \in \Theta$ where
 $\Theta \subseteq \R^d$, and $\epsilon_1, \epsilon_2, \dots$ is i.i.d.
-sequence with zero mean.
+sequence with zero mean. We define $w_t = f(z_t)$.
 
 \item $y_t = w_t + \theta^T x_t$ where $w_1, w_2, \dots$ is an i.i.d.
 sequence. A particular subvariant is to that $(D_1, z_1, w_1), (D_2, z_2, w_2),
@@ -149,10 +147,17 @@ $$
 $$
 \end{enumerate}
 
-With either of these two goals we can define the notion of regret:
+The two goals give rise to different notions of regret.  For the goal of
+maximizing the reward, we consider the policy that in round $t$ chooses the
+action 
 $$
-\Regret_T = TODO
+x_t^* = \argmax_{x \in D_t} \theta^T x
 $$
+that maximizes the expected reward. \emph{Reward regret} is the difference of the rewards  with respect to this policy is
+$$
+\RewardRegret_T = \sum_{t=1}^T \ip{\theta}{x_t - x_t^*} \; .
+$$
+For the goal estimating the 
 
 \bibliography{bibliography}
 \bibliographystyle{chicago}
