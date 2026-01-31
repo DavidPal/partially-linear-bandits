@@ -12,6 +12,7 @@
 \DeclareMathOperator*{\subjectto}{subject\ to}
 \DeclareMathOperator*{\argmax}{argmax}
 \DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator{\Exp}{\mathbf{E}}
 \DeclareMathOperator{\RewardRegret}{RewardRegret}
 \DeclareMathOperator{\EstimationRegret}{EstimationRegret}
 \newcommand{\ip}[2]{\left\langle #1, #2 \right\rangle} % inner product or bilinear map
@@ -92,42 +93,51 @@ depend on $x_1, x_2, \dots, x_{t-1}$, $y_1, y_2, \dots, y_{t-1}$, $z_1, z_2,
 \subsection{Reward $y_t$}
 
 Intuitively speaking, $y_t$ depends on both $x_t$ and $z_t$. However, formally
-speaking the dependency on $z_t$ might not exist. There are several variants of
-the problem depending on the sequence $y_1, y_2, \dots$ can be generated.
+speaking the dependency on $z_t$ might not exist. Formally, we define that
+$$
+y_t = c_t + \theta_*^T x_t + \epsilon_t
+$$
+where $\theta_* \in \R^d$ and $\epsilon_1, \epsilon_2, \dots$ is i.i.d.
+sequence with zero mean, indepent of $x_1, x_2, \dots$, $z_1, z_2, \dots$,
+$D_1, D_2, \dots$, and $c_1, c_2, \dots$. There are several variants how $c_1,
+c_2, \dots$ is generated.
 
 \begin{enumerate}
-\item The most basic model is the partially linear model $y_t = f(z_t) +
-\theta^T x_t + \epsilon_t$ where $f:\mathcal{Z} \to \R$ is a function that
-belongs to a class of functions $\mathcal{F}$, and $\theta \in \Theta$ where
-$\Theta \subseteq \R^d$, and $\epsilon_1, \epsilon_2, \dots$ is i.i.d.
-sequence with zero mean. We define $w_t = f(z_t)$.
+\item The ``realizable'' case is that $c_t = f^*(z_t)$ where $f^*:\Z \to \R$ is
+a function that lies in a function class $\mathcal{F}$.
 
-\item $y_t = w_t + \theta^T x_t$ where $w_1, w_2, \dots$ is an i.i.d.
-sequence. A particular subvariant is to that $(D_1, z_1, w_1), (D_2, z_2, w_2),
-\dots$ is i.i.d. sequence. We wish to find a function from a function class
-$\mathcal{F}$ such that $f(z_t) \approx w_t$.
+\item The ``stochastic agnostic'' case is that $c_1, c_2, \dots$ is an i.i.d.
+sequence. A particular subvariant is that $(D_1, z_1, c_1), (D_2, z_2, c_2),
+\dots$ is an i.i.d. sequence.
 
-\item $y_t = w_t + \theta^T x_t$ where $w_1, w_2, \dots$ is an arbitrary
-sequence.  Two variants are possible depending on the power of the adversary,
-oblivious vs.  adaptive. If adversary is oblivious, $w_1, w_2, \dots$ is chosen
-before the first round of the game. If the adversary is adaptive, $w_t$ can
-depend on $x_1, x_2, \dots, x_{t-1}$, $y_1, y_2, \dots, y_{t-1}$, $z_1, z_2,
-\dots z_{t-1}$ and $D_1, D_2, \dots, D_{t-1}$.
+\item The ``adversarial'' case is that $c_1, c_2, \dots$ is an arbitrary
+sequence.  Two subvariants are possible depending on the power of the
+adversary. For an oblivious adversary, $c_1, c_2, \dots$ is chosen before the
+first round of the game. For an adaptive adversary, $c_t$ can depend on $(x_1,
+y_1, z_1, c_1, D_1), (x_2, y_2, z_2, c_2, D_2), \dots, (x_{t-1}, y_{t-1},
+z_{t-1}, c_{t-1}, D_{t-1})$.
 
 \end{enumerate}
 
-\subsection{Goal of the learner}
+Note that in the first variant
+$$
+y_t = f^*(z_t) + \theta_*^T x_t + \epsilon_t
+$$
+In other words, the reward is a linear function of $x_t$ and, in general, a
+non-linear function of $z_t$. This model is called a partially linear model.
+
+\section{Goal of the learner}
 
 There are two possible goals we can have.
 
 \begin{enumerate}
 
 \item Over $T$ rounds, we collect cumulative reward $\sum_{t=1}^T y_t$. Our
-goal is collect as much reward as possible. 
+goal is collect as much reward as possible.
 
 \item Our goal is to predict $y_t$, for any possible choice of $x_t$ than can
-be made. That is, in round $t$, we have to come up with a with an affine
-function 
+be made. That is, in round $t$, in addition to $x_t$, we have to come up with a
+with an affine function
 $$
 g_t(x) = \widehat{c}_t + \widehat{\theta}_t^T x
 $$
@@ -137,27 +147,44 @@ rounds $1, 2, \dots, t-1$, we have to come up with a intercept $\widehat{c}_t
 
 The accurracy of the function $g_t$ is measured by the squared loss $\ell(y,
 \widehat{y}) = (y - \widehat{y})^2$ for the worst possible choice of $x \in
-D_t$. That is, the goal of the learner is to minimize 
+D_t$. That is, the goal of the learner is to minimize
 $$
-\max_{x \in D_t} \ell(y_t, g_t(x)) \: .
+\max_{x \in D_t} \ell(c_t + \theta_*^T x, g_t(x)) \: .
 $$
 An alternative goal is to minimize the cumulative loss
 $$
-\sum_{t=1}^T \max_{x \in D_t} \ell(y_t, g_t(x)) \: .
+\sum_{t=1}^T \max_{x \in D_t} \ell(c_t + \theta_*^T x, g_t(x)) \: .
 $$
 \end{enumerate}
 
+\section{Regret}
+
 The two goals give rise to different notions of regret.  For the goal of
 maximizing the reward, we consider the policy that in round $t$ chooses the
-action 
+action
 $$
-x_t^* = \argmax_{x \in D_t} \theta^T x
+x_t^* = \argmax_{x \in D_t} \theta_*^T x
 $$
-that maximizes the expected reward. \emph{Reward regret} is the difference of the rewards  with respect to this policy is
+that maximizes the expected reward. \emph{Reward regret} is the difference of
+the rewards  with respect to this policy is
 $$
-\RewardRegret_T = \sum_{t=1}^T \ip{\theta}{x_t - x_t^*} \; .
+\RewardRegret_T = \sum_{t=1}^T \ip{\theta_*}{x_t - x_t^*} \; .
 $$
-For the goal estimating the 
+
+For the goal of accurately estimating $y_t$ for any possible choice of $x_t$,
+let us first define the optimal predictor that depends only on $z_t$,
+$$
+f^*
+= \argmin_{f \in \mathcal{F}} \sum_{t=1}^T \ell(c_t, f(z_t))
+= \argmin_{f \in \mathcal{F}} \sum_{t=1}^T (c_t - f(z_t))^2 \: .
+$$
+The estimation regret is
+\begin{align*}
+\EstimationRegret_T
+& = \sum_{t=1}^T \max_{x \in D_t} \ell(c_t + \theta_*^T x,  \widehat{c}_t + \widehat{\theta}_t^T x) - \ell(c_t + \theta_*^T x, f^*(z_t) + \theta_*^T x) \\
+& = \sum_{t=1}^T \max_{x \in D_t} \ell(c_t + \theta_*^T x,  \widehat{c}_t + \widehat{\theta}_t^T x) - \ell(c_t, f^*(z_t)) \\
+& = \sum_{t=1}^T \max_{x \in D_t} (c_t + \theta_*^T x -  \widehat{c}_t - \widehat{\theta}_t^T x)^2 - (c_t - f^*(z_t))^2 \: .
+\end{align*}
 
 \bibliography{bibliography}
 \bibliographystyle{chicago}
